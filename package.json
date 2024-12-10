@@ -1,0 +1,49 @@
+{
+  "name": "@eyalfishler/track-processors-rvm",
+  "version": "0.3.2",
+  "description": "LiveKit track processors",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "source": "src/index.ts",
+  "types": "dist/src/index.d.ts",
+  "repository": "git@github.com:eyalfishler/track-processors-rvm.git",
+  "author": "Lukas Seiler",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tsup --onSuccess \"tsc --declaration --emitDeclarationOnly\"",
+    "build-sample": "cd example && vite build",
+    "lint": "eslint src",
+    "release": "pnpm build && changeset publish",
+    "test": "jest",
+    "sample": "vite serve example --port 9090 --open"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@mediapipe/holistic": "0.5.1675471629",
+    "@mediapipe/tasks-vision": "^0.10.18",
+    "@tensorflow/tfjs": "^4.22.0"
+  },
+  "peerDependencies": {
+    "livekit-client": "^1.12.0 || ^2.1.0"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2",
+    "@livekit/changesets-changelog-github": "^0.0.4",
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/dom-mediacapture-transform": "^0.1.6",
+    "@types/offscreencanvas": "^2019.7.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "eslint": "8.39.0",
+    "eslint-config-airbnb-typescript": "17.0.0",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-ecmascript-compat": "^3.0.0",
+    "eslint-plugin-import": "2.27.5",
+    "prettier": "^2.8.8",
+    "tsup": "^7.1.0",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8"
+  }
+}
