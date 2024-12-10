@@ -1,0 +1,10 @@
+import ProcessorWrapper from './ProcessorWrapper';
+import BackgroundTransformer, { BackgroundOptions, SegmenterOptions } from './transformers/BackgroundTransformer';
+import { RVMBackgroundOptions } from './transformers/RVMTransformer';
+export * from './transformers/types';
+export { default as VideoTransformer } from './transformers/VideoTransformer';
+export { ProcessorWrapper, type BackgroundOptions, type SegmenterOptions, BackgroundTransformer };
+export declare const BackgroundBlur: (blurRadius?: number, segmenterOptions?: SegmenterOptions) => ProcessorWrapper<BackgroundOptions>;
+export declare const VirtualBackground: (imagePath: string, segmenterOptions?: SegmenterOptions) => ProcessorWrapper<BackgroundOptions>;
+export declare const BackgroundProcessor: (options: BackgroundOptions, name?: string) => ProcessorWrapper<BackgroundOptions>;
+export declare const RVMBackgroundProcessor: (options: RVMBackgroundOptions, name?: string) => ProcessorWrapper<RVMBackgroundOptions>;
