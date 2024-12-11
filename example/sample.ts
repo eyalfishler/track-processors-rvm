@@ -41,11 +41,14 @@ const state = {
   defaultDevices: new Map<MediaDeviceKind, string>(),
   bitrateInterval: undefined as any,
   blur: BackgroundBlur(10, { delegate: 'GPU' }),
-  virtualBackground: AIVirtualBackground('./virtual_background.png', {
-    tasksVisionFileSet: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm",
-    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/image_segmenter/deeplab_v3/float32/1/deeplab_v3.tflite"
-    //modelAssetPath: "https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite"
-  }),
+  virtualBackground: VirtualBackground('./virtual_background.png'
+    // virtualBackground: AIVirtualBackground('./virtual_background.png', {
+    //   tasksVisionFileSet: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm",
+    //   //modelAssetPath: "https://storage.googleapis.com/mediapipe-models/image_segmenter/deeplab_v3/float32/1/deeplab_v3.tflite"
+    //   //modelAssetPath: "https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite"
+    //   modelAssetPath: "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite?v=aljali.mediapipestudio_20230621_1811_RC00"
+    // }
+  ),
 };
 let currentRoom: Room | undefined;
 

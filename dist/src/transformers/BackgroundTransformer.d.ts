@@ -26,6 +26,7 @@ export default class BackgroundProcessor extends VideoTransformer<BackgroundOpti
     loadBackground(path: string): Promise<void>;
     transform(frame: VideoFrame, controller: TransformStreamDefaultController<VideoFrame>): Promise<void>;
     update(opts: BackgroundOptions): Promise<void>;
+    drawVirtualBackground2(frame: VideoFrame): Promise<void>;
     drawVirtualBackground(frame: VideoFrame): Promise<void>;
     blurBackground(frame: VideoFrame): Promise<void>;
 }

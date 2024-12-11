@@ -48,15 +48,23 @@ export default class BackgroundProcessor extends VideoTransformer<BackgroundOpti
       baseOptions: {
         modelAssetPath:
           this.options.assetPaths?.modelAssetPath ??
-          // 'https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite',
-          'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite',
+          //'https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite',
+          "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/1/selfie_multiclass_256x256.tflite",
+        // 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
+        //'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite?v=aljali.mediapipestudio_20230621_1811_RC00',
+        //'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite',
         delegate: 'GPU',
         ...this.options.segmenterOptions,
       },
       runningMode: 'VIDEO',
-      outputCategoryMask: true,
-      outputConfidenceMasks: false,
+      //outputconfidenceMasks: false,
+      outputConfidenceMasks: true,
+
+      outputCategoryMask: false,
+      //outputConfidenceMasks: true,
     });
+
+
 
     // Skip loading the image here if update already loaded the image below
     if (this.options?.imagePath && !this.backgroundImage) {
@@ -122,18 +130,67 @@ export default class BackgroundProcessor extends VideoTransformer<BackgroundOpti
     }
   }
 
-  async drawVirtualBackground(frame: VideoFrame) {
+
+
+  async drawVirtualBackground2(frame: VideoFrame) {
     if (!this.canvas || !this.ctx || !this.segmentationResults || !this.inputVideo) return;
     // this.ctx.save();
     // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     if (this.segmentationResults?.categoryMask) {
-      this.ctx.filter = 'blur(10px)';
-      this.ctx.globalCompositeOperation = 'copy';
+      this.ctx.filter = 'blur(4px)';
+      this.ctx.globalCompositeOperation = 'destination-atop';
       const bitmap = await maskToBitmap(
         this.segmentationResults.categoryMask,
         this.segmentationResults.categoryMask.width,
         this.segmentationResults.categoryMask.height,
       );
+      this.ctx.drawImage(bitmap, 0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.filter = 'none';
+      this.ctx.globalCompositeOperation = 'source-in';
+      if (this.backgroundImage) {
+        this.ctx.drawImage(
+          this.backgroundImage,
+          0,
+          0,
+          this.backgroundImage.width,
+          this.backgroundImage.height,
+          0,
+          0,
+          this.canvas.width,
+          this.canvas.height,
+        );
+      } else {
+        this.ctx.fillStyle = '#00FF00';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+
+      this.ctx.globalCompositeOperation = 'destination-over';
+    }
+    this.ctx.drawImage(frame, 0, 0, this.canvas.width, this.canvas.height);
+    // this.ctx.restore();
+  }
+
+
+  async drawVirtualBackground(frame: VideoFrame) {
+    if (!this.canvas || !this.ctx || !this.segmentationResults || !this.inputVideo) return;
+    // console.log("drawVirtualBackground");
+    // this.ctx.save();
+    // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    if (this.segmentationResults?.confidenceMasks) {
+      this.ctx.filter = 'blur(2px)';
+      this.ctx.globalCompositeOperation = 'destination-atop';
+      const mask = this.segmentationResults?.confidenceMasks[0];
+      if (mask && mask.height == 0) {
+        //console.log("mask.height == 0");
+        return;
+      }
+      const bitmap = await maskToBitmap(mask, mask.width, mask.height);
+
+      // const bitmap = await maskToBitmap(
+      //   this.segmentationResults.confidenceMasks[0],
+      //   this.segmentationResults.confidenceMasks[0].width,
+      //   this.segmentationResults.confidenceMasks[0].height,
+      // );
       this.ctx.drawImage(bitmap, 0, 0, this.canvas.width, this.canvas.height);
       this.ctx.filter = 'none';
       this.ctx.globalCompositeOperation = 'source-in';
@@ -179,7 +236,7 @@ export default class BackgroundProcessor extends VideoTransformer<BackgroundOpti
       this.segmentationResults.categoryMask.height,
     );
 
-    this.ctx.filter = 'blur(3px)';
+    this.ctx.filter = 'blur(0px)';
     this.ctx.globalCompositeOperation = 'copy';
     this.ctx.drawImage(bitmap, 0, 0, this.canvas.width, this.canvas.height);
     this.ctx.filter = 'none';

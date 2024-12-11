@@ -148,14 +148,19 @@ var BackgroundProcessor = class extends VideoTransformer {
     this.imageSegmenter = await vision.ImageSegmenter.createFromOptions(fileSet, {
       baseOptions: __spreadValues({
         modelAssetPath: (_d = (_c = this.options.assetPaths) == null ? void 0 : _c.modelAssetPath) != null ? _d : (
-          // 'https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite',
-          "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite"
+          //'https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite',
+          "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/1/selfie_multiclass_256x256.tflite"
         ),
+        // 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
+        //'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite?v=aljali.mediapipestudio_20230621_1811_RC00',
+        //'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite',
         delegate: "GPU"
       }, this.options.segmenterOptions),
       runningMode: "VIDEO",
-      outputCategoryMask: true,
-      outputConfidenceMasks: false
+      //outputconfidenceMasks: false,
+      outputConfidenceMasks: true,
+      outputCategoryMask: false
+      //outputConfidenceMasks: true,
     });
     if (((_e = this.options) == null ? void 0 : _e.imagePath) && !this.backgroundImage) {
       await this.loadBackground(this.options.imagePath).catch((err) => console.error("Error while loading processor background image: ", err));
@@ -215,18 +220,53 @@ var BackgroundProcessor = class extends VideoTransformer {
       await this.loadBackground(opts.imagePath);
     }
   }
-  async drawVirtualBackground(frame) {
+  async drawVirtualBackground2(frame) {
     var _a;
     if (!this.canvas || !this.ctx || !this.segmentationResults || !this.inputVideo)
       return;
     if ((_a = this.segmentationResults) == null ? void 0 : _a.categoryMask) {
-      this.ctx.filter = "blur(10px)";
-      this.ctx.globalCompositeOperation = "copy";
+      this.ctx.filter = "blur(4px)";
+      this.ctx.globalCompositeOperation = "destination-atop";
       const bitmap = await maskToBitmap(
         this.segmentationResults.categoryMask,
         this.segmentationResults.categoryMask.width,
         this.segmentationResults.categoryMask.height
       );
+      this.ctx.drawImage(bitmap, 0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.filter = "none";
+      this.ctx.globalCompositeOperation = "source-in";
+      if (this.backgroundImage) {
+        this.ctx.drawImage(
+          this.backgroundImage,
+          0,
+          0,
+          this.backgroundImage.width,
+          this.backgroundImage.height,
+          0,
+          0,
+          this.canvas.width,
+          this.canvas.height
+        );
+      } else {
+        this.ctx.fillStyle = "#00FF00";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+      this.ctx.globalCompositeOperation = "destination-over";
+    }
+    this.ctx.drawImage(frame, 0, 0, this.canvas.width, this.canvas.height);
+  }
+  async drawVirtualBackground(frame) {
+    var _a, _b;
+    if (!this.canvas || !this.ctx || !this.segmentationResults || !this.inputVideo)
+      return;
+    if ((_a = this.segmentationResults) == null ? void 0 : _a.confidenceMasks) {
+      this.ctx.filter = "blur(2px)";
+      this.ctx.globalCompositeOperation = "destination-atop";
+      const mask = (_b = this.segmentationResults) == null ? void 0 : _b.confidenceMasks[0];
+      if (mask && mask.height == 0) {
+        return;
+      }
+      const bitmap = await maskToBitmap(mask, mask.width, mask.height);
       this.ctx.drawImage(bitmap, 0, 0, this.canvas.width, this.canvas.height);
       this.ctx.filter = "none";
       this.ctx.globalCompositeOperation = "source-in";
@@ -262,7 +302,7 @@ var BackgroundProcessor = class extends VideoTransformer {
       this.segmentationResults.categoryMask.width,
       this.segmentationResults.categoryMask.height
     );
-    this.ctx.filter = "blur(3px)";
+    this.ctx.filter = "blur(0px)";
     this.ctx.globalCompositeOperation = "copy";
     this.ctx.drawImage(bitmap, 0, 0, this.canvas.width, this.canvas.height);
     this.ctx.filter = "none";
