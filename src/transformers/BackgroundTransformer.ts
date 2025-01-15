@@ -48,8 +48,8 @@ export default class BackgroundProcessor extends VideoTransformer<BackgroundOpti
       baseOptions: {
         modelAssetPath:
           this.options.assetPaths?.modelAssetPath ??
-          //'https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite',
-          "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/1/selfie_multiclass_256x256.tflite",
+          'https://storage.googleapis.com/mediapipe-tasks/image_segmenter/selfie_segmentation.tflite',
+        //"https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/1/selfie_multiclass_256x256.tflite",
         // 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
         //'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite?v=aljali.mediapipestudio_20230621_1811_RC00',
         //'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite',
@@ -110,7 +110,7 @@ export default class BackgroundProcessor extends VideoTransformer<BackgroundOpti
       if (this.blurRadius) {
         await this.blurBackground(frame);
       } else {
-        await this.drawVirtualBackground(frame);
+        await this.drawVirtualBackground2(frame);
       }
       const newFrame = new VideoFrame(this.canvas, {
         timestamp: frame.timestamp || Date.now(),
